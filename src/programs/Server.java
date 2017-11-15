@@ -198,11 +198,8 @@ public class Server extends UnicastRemoteObject implements Printer{
 		}
 		if(tmpUser == null) return new Session(username, "User not found", false);
 		
-		
-		byte[] incomingPassword = CryptFunctions.hash(tmpUser.getUsername() + ":" + CryptFunctions.bytesToString(password) + ":" + CryptFunctions.bytesToString(tmpUser.getSalt()));
-		
+		byte[] incomingPassword = CryptFunctions.hash(tmpUser.getUsername() + ":" + CryptFunctions.bytesToString(password) + ":" + CryptFunctions.bytesToString(tmpUser.getSalt()));		
 		byte[] userPassword = tmpUser.getPassword();
-		//System.out.println("COMPARING \n" + CryptFunctions.bytesToString(incomingPassword) + "\n" + CryptFunctions.bytesToString(userPassword));
 		
 		if(Arrays.equals(incomingPassword, userPassword)){
 			String uniqueID = UUID.randomUUID().toString();
@@ -227,7 +224,6 @@ public class Server extends UnicastRemoteObject implements Printer{
 		for(Session se : sessionList){
 			if(s.getSessionID().equals(se.getSessionID())) return true;
 		}
-		System.out.println("Possible intruder detected");
 		return false;
 	}
 	

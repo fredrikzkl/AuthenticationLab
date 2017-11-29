@@ -20,6 +20,7 @@ public class User implements Serializable{
 	
 	private String id;
 	
+	
 	public List<Configuration> configList;
 	
 	public User(String username, byte[] hashedPassword){

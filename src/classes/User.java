@@ -19,18 +19,17 @@ public class User implements Serializable{
 	private byte[] salt;
 	
 	private String id;
+	private Role role;
 	
 	
-	public List<Configuration> configList;
 	
-	public User(String username, byte[] hashedPassword){
+	public User(String username, byte[] hashedPassword, Role role){
 		this.username = username;
+		this.role = role;
 		
 		salt = CryptFunctions.generateSalt();
 		password = CryptFunctions.hash(username + ":" + CryptFunctions.bytesToString(hashedPassword) + ":" + CryptFunctions.bytesToString(salt));
-		
-		configList = new ArrayList<>();
-		
+				
 		id = UUID.randomUUID().toString();
 	}
 
@@ -49,6 +48,10 @@ public class User implements Serializable{
 
 	public String getId() {
 		return id;
+	}
+
+	public Role getRole() {
+		return role;
 	}
 	
 	

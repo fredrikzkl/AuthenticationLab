@@ -11,11 +11,11 @@ import java.util.Scanner;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import classes.Access;
 import classes.Configuration;
 import classes.CryptFunctions;
 import classes.FileHandler;
 import classes.Role;
-import classes.Roles;
 import classes.Session;
 import classes.User;
 
@@ -28,9 +28,13 @@ public class Server extends UnicastRemoteObject implements Printer{
 	private static final long serialVersionUID = 5580036158652906052L;
 	private final String permissionString = "Granted";
 	
-	private FileHandler io;
+	private FileHandler userIO;
+	
 	private List<Session> sessionList;
+	private List<Access> accessList;
 	private List<String> log;
+	
+	public List<Configuration> configList;
 	
 	private List<Job> queue;
 	
@@ -38,6 +42,7 @@ public class Server extends UnicastRemoteObject implements Printer{
 		super();
 		sessionList = new ArrayList<>();
 		log = new ArrayList<>();
+		configList = new ArrayList<>();
 		queue = new ArrayList<>();
 		
 		queue.add(new Job("Test1", "Printer1", "Fredrik"));
@@ -45,7 +50,10 @@ public class Server extends UnicastRemoteObject implements Printer{
 		queue.add(new Job("Test3", "Printer1", "Fredrik"));
 		queue.add(new Job("Test4", "Printer1", "Fredrik"));
 		
-		io = new FileHandler("userdata");
+		userIO = new FileHandler("userdata");
+		
+		List<Access> accessIO = (List<Access>) new FileHandler("accessData");
+		this.accessList = ((FileHandler) accessIO).getAccessList();
 	}
 
 	@Override
@@ -57,7 +65,7 @@ public class Server extends UnicastRemoteObject implements Printer{
 	@Override
 	public int print(String filename, String printer, Session session) throws RemoteException{
 		if(approveSession(session)){
-			String response = givePermission(session, Roles.User);
+			String response = givePermission(session, "print");
 			if(response.equals(permissionString)){
 				Job temp = new Job(filename,printer,session.getUsername());
 				queue.add(temp);
@@ -72,7 +80,7 @@ public class Server extends UnicastRemoteObject implements Printer{
 	@Override
 	public String queue(Session session) throws RemoteException{
 		if(approveSession(session)){
-			String response = givePermission(session, Roles.User);
+			String response = givePermission(session, "queue");
 			if(response.equals(permissionString)){
 				String queue_value = "Queue: \n";
 				for(int i = 0; i < queue.size() ; i++){
@@ -93,7 +101,7 @@ public class Server extends UnicastRemoteObject implements Printer{
 	@Override
 	public String topQueue(int job, Session session) throws RemoteException{
 		if(approveSession(session)){
-			String response =givePermission(session, Roles.PowerUser);
+			String response =givePermission(session, "topQueue");
 			
 			if(response.equals(permissionString)){
 				if(queue.isEmpty()) return "No jobs yet. The qeueue is empty";
@@ -123,7 +131,7 @@ public class Server extends UnicastRemoteObject implements Printer{
 	@Override
 	public String start(Session s) throws RemoteException{
 		if(approveSession(s)){
-			String response = givePermission(s,Roles.Technician); 
+			String response = givePermission(s,"start"); 
 			if(response.equals(permissionString)){
 				return "OK";
 			}else{
@@ -149,11 +157,7 @@ public class Server extends UnicastRemoteObject implements Printer{
 	@Override
 	public String restart(Session s) throws RemoteException{
 		if(approveSession(s)){
-			String response = givePermission(s, Roles.Technician);
-			
-			if(!response.equals(permissionString)) 
-				response = givePermission(s, Roles.PowerUser);
-			
+			String response = givePermission(s, "restart");
 			if(response.equals(permissionString)){
 				queue.clear();
 				return "Server restarted";
@@ -168,7 +172,7 @@ public class Server extends UnicastRemoteObject implements Printer{
 	@Override
 	public String status(Session s) throws RemoteException{
 		if(approveSession(s)){
-			String response = givePermission(s, Roles.Technician);
+			String response = givePermission(s, "status");
 			if(response.equals(permissionString)){
 				return "Everything is ok";
 			}else{
@@ -182,19 +186,18 @@ public class Server extends UnicastRemoteObject implements Printer{
 	//READ CONFIG: Technician Function
 	public String readConfig(String parameter, Session session) throws RemoteException{
 		if(approveSession(session)){
-			String response = givePermission(session, Roles.Technician);
+			String response = givePermission(session, "readConfig");
 			if(response.equals(permissionString)){
-				User u = io.getUser(session.getUsername());
 				if(parameter.isEmpty()) return "Paramter not found";
 				String config_log = "";
 				if(parameter.toLowerCase().equals("-a") || parameter.toLowerCase().equals("all") || parameter.equals(".")){
 					config_log += "Configurations:\n";
-					for(Configuration c : u.configList){
+					for(Configuration c : configList){
 						config_log += c.toString() + "\n";
 					}
 				}
 				else{
-					for(Configuration c : u.configList){
+					for(Configuration c : configList){
 						if(c.getParamter().equals(parameter)){
 							config_log = c.toString();
 							break;
@@ -215,23 +218,19 @@ public class Server extends UnicastRemoteObject implements Printer{
 	@Override
 	public String setConfig(String parameter, String value, Session session)throws RemoteException {
 		if(approveSession(session)){
-			String response = givePermission(session, Roles.Technician);
+			String response = givePermission(session, "setConfig");
 			if(response.equals(permissionString)){
 				if(value == "" || parameter == "") return "This command requres a paramter and a value";
-				User u = io.getUser(session.getUsername());
-				for(Configuration c : u.configList){
+				for(Configuration c : configList){
 					if(c.getParamter().equals(parameter)){
 						log(session.getUsername() + "'s configuration for '" + parameter + "' changed from value " + c.getValue() + " to " + value);
 						c.setValue(value);
-						io.save(u);
 						log("User " + session.getUsername() + " edited configuration '" + parameter + "' to '" + value + "'");
 						return "Configuration altered!";
 					}
 				}
-				u.configList.add(new Configuration(parameter, value));
-				log("New Configuration '" + parameter + "', added for '" + session.getUsername() + "', with value: " + value);
-				io.save(u);
-				log("User " + session.getUsername() + " added a new configuration '" + parameter + "' with the value: "+ value);
+				configList.add(new Configuration(parameter, value));
+				log("New Configuration '" + parameter + "', added by '" + session.getUsername() + "', with value: " + value);
 				return "New Configuration added!";
 			}else{
 				return response;
@@ -248,7 +247,7 @@ public class Server extends UnicastRemoteObject implements Printer{
 
 	@Override
 	public Session authentication(String username, byte[] password) throws RemoteException {
-		List<User> ul = io.getUsers();
+		List<User> ul = userIO.getUsers();
 		User tmpUser = null;
 		for(User u : ul){
 			if(username.equals(u.getUsername())){
@@ -271,15 +270,6 @@ public class Server extends UnicastRemoteObject implements Printer{
 		return new Session(username, "Unauthorized. ", false);
 	}
 	
-	private String findUserFromSessionID(String sessionID){
-		for(Session s : sessionList){
-			if(s.equals(sessionID)){
-				return s.getUsername();
-			}
-		}
-		return "User not found";
-	}
-	
 	private boolean approveSession(Session s){
 		for(Session se : sessionList){
 			if(s.getSessionID().equals(se.getSessionID())) return true;
@@ -287,30 +277,14 @@ public class Server extends UnicastRemoteObject implements Printer{
 		return false;
 	}
 	
-	private String givePermission(Session s, Roles requiredRole){
-		Role roleToUser = io.getRoleToUser(s.getUsername());
-		switch(roleToUser.getRole()){
-			case Admin:
+	private String givePermission(Session s, String function){
+		User temp = userIO.getUser(s.getUsername());
+		for(Access a : accessList){
+			if(a.getFunctionName().equals(function) && a.getRole().equals(temp.getRole())){
 				return permissionString;
-			case PowerUser:
-				if(requiredRole == Roles.PowerUser || requiredRole == Roles.User){
-					return permissionString;
-				}
-				return "This function not available to Power Users";
-			case Technician:
-				if(requiredRole == Roles.Technician){
-					return permissionString;
-				}
-				return "This function is not available to Technicians";
-			case User:
-				if(requiredRole == Roles.User){
-					return permissionString;
-				}
-				return "Users don't have permission to use this function."; 
-			default:
-				break;
+			}
 		}
-		return "This user has no assigned role";
+		return temp.getRole() + " does not have access to the " + function + " function";
 	}
 	
 	private static class Job{

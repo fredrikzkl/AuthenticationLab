@@ -1,29 +1,15 @@
 package classes;
 
-import java.io.Serializable;
-
-public class Role implements Serializable{
+public enum Role {
 	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
-
-	private String userID;
+	User(1),
+	Technician(2),
+	PowerUser(3),
+	Admin(4);
 	
-	private Roles role;
+	private final int roleID;
 	
-	public Role(String userID, Roles role){
-		this.userID = userID;
-		this.role = role;
+	Role(int roleID){
+		this.roleID = roleID;
 	}
-
-	public String getUserID() {
-		return userID;
-	}
-
-	public Roles getRole() {
-		return role;
-	}
-	
 }

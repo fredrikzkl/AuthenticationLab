@@ -18,7 +18,7 @@ public class FileHandler {
 	private String filename;
 	
 	private final String userDir = "./files/" + "userdata" + ".ser";
-	private final String rolesDir = "./files/" + "roles" + ".ser";
+	private final String rolesDir = "./files/" + "accessList" + ".ser";
 	
 	
 	public FileHandler(String filename){
@@ -32,7 +32,7 @@ public class FileHandler {
 
 		try {
 
-			fout = new FileOutputStream("filename");
+			fout = new FileOutputStream(filename);
 			oos = new ObjectOutputStream(fout);
 			
 			oos.writeObject(list);
@@ -72,7 +72,7 @@ public class FileHandler {
 		}
 		return null;
 	}
-	
+	/*
 	public Role getRoleToUser(String username){
 		String userID = getUser(username).getId();
 		List<Role> rl = getRoles();
@@ -81,21 +81,13 @@ public class FileHandler {
 			if(r.getUserID().equals(userID)) return r;
 		}
 		return null;
-	}
+	}*/
 	
 	public String save(User user){
 		List<User> userList = getUsers();
 		for(int i = 0; i<userList.size() ; i++){
 			if(userList.get(i).getUsername().equals(user.getUsername())){
 				userList.set(i, user);
-			}
-		}
-		System.out.println("USERS CHANGED!");
-		for(User u : userList){
-			if(u.getUsername().equals(user.getUsername())){
-				for(Configuration c : u.configList){
-					System.out.println(c);
-				}
 			}
 		}
 		writeListToFile(userList);
@@ -135,17 +127,19 @@ public class FileHandler {
 		return pl;
 	}
 	
+	
+	
 	@SuppressWarnings("unchecked")
-	public List<Role> getRoles() {
+	public List<Access> getAccessList() {
 
-		List<Role> pl = null;
+		List<Access> al = null;
 		FileInputStream fin = null;
 		ObjectInputStream ois = null;
 		try {
-			fin = new FileInputStream(rolesDir);
+			fin = new FileInputStream(filename);
 			ois = new ObjectInputStream(fin);
 			
-	        pl = (List<Role>) ois.readObject();
+	        al = (List<Access>) ois.readObject();
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		} finally {
@@ -164,43 +158,64 @@ public class FileHandler {
 				}
 			}
 		}
-		return pl;
+		return al;
 	}
 	
+
+	public void generateAccessList(){
+		List<Access> al = new ArrayList<>();
+		
+		al.add(new Access(Role.User, "print"));
+		al.add(new Access(Role.User, "queue"));
+		al.add(new Access(Role.User, "stop"));
+		
+		al.add(new Access(Role.PowerUser,"print"));
+		al.add(new Access(Role.PowerUser,"queue"));
+		al.add(new Access(Role.PowerUser,"topQueue"));
+		al.add(new Access(Role.PowerUser,"stop"));
+		al.add(new Access(Role.PowerUser,"restart"));
+		
+		al.add(new Access(Role.Technician,"start"));
+		al.add(new Access(Role.Technician,"stop"));
+		al.add(new Access(Role.Technician,"print"));
+		al.add(new Access(Role.Technician,"restart"));
+		al.add(new Access(Role.Technician,"status"));
+		al.add(new Access(Role.Technician,"readConfig"));
+		al.add(new Access(Role.Technician,"setConfig"));
+		
+		al.add(new Access(Role.Admin,"print"));
+		al.add(new Access(Role.Admin,"queue"));
+		al.add(new Access(Role.Admin,"topQueue"));
+		al.add(new Access(Role.Admin,"start"));
+		al.add(new Access(Role.Admin,"stop"));
+		al.add(new Access(Role.Admin,"print"));
+		al.add(new Access(Role.Admin,"restart"));
+		al.add(new Access(Role.Admin,"status"));
+		al.add(new Access(Role.Admin,"readConfig"));
+		al.add(new Access(Role.Admin,"setConfig"));
+		
+		writeListToFile(al);
+	}
+	
+	
 	public static void main(String[] args) {
+		FileHandler access = new FileHandler("accessData");
+		access.generateAccessList();
 		FileHandler io = new FileHandler("userdata");
 		List<User> userBase = new ArrayList<User>();
-		User andreas = new User("Andreas",  CryptFunctions.hash("monkey"));
+		User andreas = new User("Andreas",  CryptFunctions.hash("monkey"), Role.User);
 		userBase.add(andreas);
-		User tank = new User("Jon", CryptFunctions.hash("MegaStrongPasswordHashtagWillNeverBeCracked1337h4x0r"));
+		User tank = new User("Jon", CryptFunctions.hash("MegaStrongPasswordHashtagWillNeverBeCracked1337h4x0r"),Role.User);
 		userBase.add(tank);
-		User fredrik = new User("Fredrik", CryptFunctions.hash("asdasd"));
-		fredrik.configList.add(new Configuration("Size", "3"));
+		User fredrik = new User("Fredrik", CryptFunctions.hash("asdasd"),Role.PowerUser);
 		userBase.add(fredrik);
-		User alice = new User("Alice",CryptFunctions.hash("IHaveThePower"));
+		User alice = new User("Alice",CryptFunctions.hash("IHaveThePower"),Role.Admin);
 		userBase.add(alice);
-		User bob = new User("Bob",CryptFunctions.hash("ILoveJanitorLyfe"));
+		User bob = new User("Bob",CryptFunctions.hash("ILoveJanitorLyfe"),Role.Technician);
 		userBase.add(bob);
 		io.writeListToFile(userBase);
-		
-		FileHandler roles_file = new FileHandler("roles");
-		List<Role> r_list = new ArrayList<Role>();
-		
-		Role r1 = new Role(andreas.getId(),Roles.User);
-		r_list.add(r1);
-		
-		Role r3 = new Role(fredrik.getId(),Roles.PowerUser);
-		r_list.add(r3);
-
-		Role r5 = new Role(bob.getId(),Roles.Technician);
-		r_list.add(r5);
-		
-		Role r6 = new Role(alice.getId(), Roles.Admin);
-		r_list.add(r6);
-		
-		roles_file.writeListToFile(r_list);
-		
-		
 	}
+	
+	
 	
 }

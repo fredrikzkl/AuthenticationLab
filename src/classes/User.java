@@ -3,7 +3,6 @@ package classes;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class User implements Serializable{
 	
@@ -18,9 +17,6 @@ public class User implements Serializable{
 	private byte[] password;
 	private byte[] salt;
 	
-	private String id;
-	
-	
 	public List<Configuration> configList;
 	
 	public User(String username, byte[] hashedPassword){
@@ -31,7 +27,6 @@ public class User implements Serializable{
 		
 		configList = new ArrayList<>();
 		
-		id = UUID.randomUUID().toString();
 	}
 
 	public String getUsername() {
@@ -45,10 +40,6 @@ public class User implements Serializable{
 
 	public byte[] getSalt() {
 		return salt;
-	}
-
-	public String getId() {
-		return id;
 	}
 	
 	

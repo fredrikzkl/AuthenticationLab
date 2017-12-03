@@ -52,8 +52,8 @@ public class Server extends UnicastRemoteObject implements Printer{
 		
 		userIO = new FileHandler("userdata");
 		
-		List<Access> accessIO = (List<Access>) new FileHandler("accessData");
-		this.accessList = ((FileHandler) accessIO).getAccessList();
+		FileHandler acfile =  new FileHandler("accessData");
+		this.accessList = acfile.getAccessList();
 	}
 
 	@Override

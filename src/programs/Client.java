@@ -81,6 +81,9 @@ public class Client {
 						case "restart":
 							response = p.restart(sesh);
 							break;
+						case "status":
+							response = p.status(sesh);
+							break;
 						case "stop":
 							p.stop(sesh);
 							System.out.println("Session Stopped. Thank you using the printer <3");

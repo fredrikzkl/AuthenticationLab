@@ -193,91 +193,51 @@ public class FileHandler {
 		// Administrating user-names and passwords
 		FileHandler io = new FileHandler("userdata");
 		List<User> userBase = new ArrayList<User>();
-		User alice = new User("Alice",  CryptFunctions.hash("password"));
-		userBase.add(alice);
-		User bob = new User("Bob",  CryptFunctions.hash("password"));
-		userBase.add(bob);
-		User cecilia = new User("Cecilia",  CryptFunctions.hash("password"));
-		userBase.add(cecilia);
-		User david = new User("David",  CryptFunctions.hash("password"));
-		userBase.add(david);
-		User erica = new User("Erica",  CryptFunctions.hash("password"));
-		userBase.add(erica);
-		User fred = new User("Fred",  CryptFunctions.hash("password"));
-		userBase.add(fred);
-		User george = new User("George",  CryptFunctions.hash("password"));
-		userBase.add(george);
+		userBase.add(new User("Alice",  CryptFunctions.hash("password")));
+		userBase.add(new User("Bob",  CryptFunctions.hash("password")));
+		userBase.add(new User("Cecilia",  CryptFunctions.hash("password")));
+		userBase.add(new User("David",  CryptFunctions.hash("password")));
+		userBase.add(new User("Erica",  CryptFunctions.hash("password")));
 		io.writeUsersToFile(userBase);
 		
 		// Administrating user-names and accesses
 		FileHandler io2 = new FileHandler("userAccess");
 		List<Access> userAcc = new ArrayList<Access>();
 		// Adding Alice
-		Access alice1 = new Access("Alice", "print");
-		userAcc.add(alice1);
-		Access alice2 = new Access("Alice", "queue");
-		userAcc.add(alice2);
-		Access alice3 = new Access("Alice", "topQueue");
-		userAcc.add(alice3);
-		Access alice4 = new Access("Alice", "start");
-		userAcc.add(alice4);
-		Access alice5 = new Access("Alice", "stop");
-		userAcc.add(alice5);
-		Access alice6 = new Access("Alice", "restart");
-		userAcc.add(alice6);
-		Access alice7 = new Access("Alice", "status");
-		userAcc.add(alice7);
-		Access alice8 = new Access("Alice", "readConfig");
-		userAcc.add(alice8);
-		Access alice9 = new Access("Alice", "setConfig");
-		userAcc.add(alice9);
+		userAcc.add(new Access("Alice","print"));
+		userAcc.add(new Access("Alice","queue"));
+		userAcc.add(new Access("Alice","topQueue"));
+		userAcc.add(new Access("Alice","start"));
+		userAcc.add(new Access("Alice","stop"));
+		userAcc.add(new Access("Alice","restart"));
+		userAcc.add(new Access("Alice","status"));
+		userAcc.add(new Access("Alice","readConfig"));
+		userAcc.add(new Access("Alice","setConfig"));
 		// Adding Bob
-		Access bob1 = new Access("Bob", "start");
-		userAcc.add(bob1);
-		Access bob2 = new Access("Bob", "stop");
-		userAcc.add(bob2);
-		Access bob3 = new Access("Bob", "restart");
-		userAcc.add(bob3);
-		Access bob4 = new Access("Bob", "status");
-		userAcc.add(bob4);
-		Access bob5 = new Access("Bob", "readConfig");
-		userAcc.add(bob5);
-		Access bob6= new Access("Bob", "setConfig");
-		userAcc.add(bob6);
+		userAcc.add(new Access("Bob","start"));
+		userAcc.add(new Access("Bob","stop"));
+		userAcc.add(new Access("Bob","restart"));
+		userAcc.add(new Access("Bob","status"));
+		userAcc.add(new Access("Bob","readConfig"));
+		userAcc.add(new Access("Bob","setConfig"));
 		// Adding Cecilia
-		Access cecilia1 = new Access("Cecilia", "print");
-		userAcc.add(cecilia1);
-		Access cecilia2 = new Access("Cecilia", "queue");
-		userAcc.add(cecilia2);
-		Access cecilia3 = new Access("Cecilia", "topQueue");
-		userAcc.add(cecilia3);
-		Access cecilia4 = new Access("Cecilia", "restart");
-		userAcc.add(cecilia4);
+		userAcc.add(new Access("Cecilia","print"));
+		userAcc.add(new Access("Cecilia","queue"));
+		userAcc.add(new Access("Cecilia","topQueue"));
+		userAcc.add(new Access("Cecilia","restart"));
 		// Adding the four normal users:
-		Access david1 = new Access("David", "print");
-		userAcc.add(david1);
-		Access david2 = new Access("David", "queue");
-		userAcc.add(david2);
-		Access erica1 = new Access("Erica", "print");
-		userAcc.add(erica1);
-		Access erica2 = new Access("Erica", "queue");
-		userAcc.add(erica2);
-		Access fred1 = new Access("Fred", "print");
-		userAcc.add(fred1);
-		Access fred2 = new Access("Fred", "queue");
-		userAcc.add(fred2);
-		Access george1 = new Access("George", "print");
-		userAcc.add(george1);
-		Access george2 = new Access("George", "queue");
-		userAcc.add(george2);
-		
+		userAcc.add(new Access("David","print"));
+		userAcc.add(new Access("David","queue"));
+		userAcc.add(new Access("Erica","print"));
+		userAcc.add(new Access("Erica","queue"));
+		userAcc.add(new Access("Fred","print"));
+		userAcc.add(new Access("Fred","queue"));
+		userAcc.add(new Access("George","print"));
+		userAcc.add(new Access("George","queue"));	
 		
 		io2.writeAccessToFile(userAcc);
 		
 		List<Access> al = io2.getAccesses();
-		for(Access a : al) {
-			System.out.println(a.getUsername() + " " + a.getAccessibleFunction());
-		}
 	}
 	
 }

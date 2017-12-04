@@ -232,22 +232,18 @@ public class FileHandler {
 		Access alice9 = new Access("Alice", "setConfig");
 		userAcc.add(alice9);
 		// Adding Bob
-		Access bob1 = new Access("Bob", "print");
+		Access bob1 = new Access("Bob", "start");
 		userAcc.add(bob1);
-		Access bob2 = new Access("Bob", "queue");
+		Access bob2 = new Access("Bob", "stop");
 		userAcc.add(bob2);
-		Access bob3 = new Access("Bob", "start");
+		Access bob3 = new Access("Bob", "restart");
 		userAcc.add(bob3);
-		Access bob4 = new Access("Bob", "stop");
+		Access bob4 = new Access("Bob", "status");
 		userAcc.add(bob4);
-		Access bob5 = new Access("Bob", "restart");
+		Access bob5 = new Access("Bob", "readConfig");
 		userAcc.add(bob5);
-		Access bob6 = new Access("Bob", "status");
+		Access bob6= new Access("Bob", "setConfig");
 		userAcc.add(bob6);
-		Access bob7 = new Access("Bob", "readConfig");
-		userAcc.add(bob7);
-		Access bob8 = new Access("Bob", "setConfig");
-		userAcc.add(bob8);
 		// Adding Cecilia
 		Access cecilia1 = new Access("Cecilia", "print");
 		userAcc.add(cecilia1);

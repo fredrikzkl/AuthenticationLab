@@ -63,17 +63,17 @@ public class Server extends UnicastRemoteObject implements Printer{
 	
 	//PRINT: User Function
 	@Override
-	public int print(String filename, String printer, Session session) throws RemoteException{
+	public String print(String filename, String printer, Session session) throws RemoteException{
 		if(approveSession(session)){
 			String response = givePermission(session, "print");
 			if(response.equals(permissionString)){
 				Job temp = new Job(filename,printer,session.getUsername());
 				queue.add(temp);
 				log(session.getUsername() + " added a new job! The file '"+ filename + "' is going to print at '" + printer + "'. JobID: " + temp.id);
-				return temp.id;
+				return "New print successfully added! ID" + temp.id;
 			}
 		}
-		return -1;
+		return "Access Denied";
 	}
 	
 	//QUEUE: User Function

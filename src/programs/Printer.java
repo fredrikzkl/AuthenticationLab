@@ -9,7 +9,7 @@ public interface Printer extends Remote{
 	
 	public String echo(String input) throws RemoteException;
 	public Session authentication(String username, byte[] password) throws RemoteException;
-	public int print(String filename, String printer, Session session) throws RemoteException; 
+	public String print(String filename, String printer, Session session) throws RemoteException; 
 	public String queue(Session session) throws RemoteException;   
 	public String topQueue(int job, Session session) throws RemoteException;
 	public String start(Session s) throws RemoteException;

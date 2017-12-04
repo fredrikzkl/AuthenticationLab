@@ -47,8 +47,7 @@ public class Client {
 
 						case "print":
 							try{
-								int id = p.print(cmd[1], cmd[2], sesh);
-								if(id != -1) response = "Print added! ID: " + id;
+								response = p.print(cmd[1], cmd[2], sesh);
 							}catch(ArrayIndexOutOfBoundsException e){
 								response  = "The Print function requre a 'filename' and a 'printer'";
 							}
